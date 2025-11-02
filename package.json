@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sci-Studio/bookstore..node.git"
+    "url": "git+https://github.com/Sci-Studio/bookstore.node.git"
   },
   "author": "Hisham Saeed",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Sci-Studio/bookstore..node/issues"
+    "url": "https://github.com/Sci-Studio/bookstore.node/issues"
   },
-  "homepage": "https://github.com/Sci-Studio/bookstore..node#readme",
+  "homepage": "https://github.com/Sci-Studio/bookstore.node#readme",
   "dependencies": {
     "@prisma/client": "^6.18.0",
     "cors": "^2.8.5",
