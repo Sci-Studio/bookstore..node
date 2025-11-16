@@ -31,7 +31,25 @@ az storage account create \
   --resource-group $RG \
   --location $LOCATION \
   --sku Standard_LRS \
-  --kind StorageV2
+  --kind StorageV2 \
+  --allow-blob-public-access true
+
+echo "Checking when Allow Blob Public Access becomes active..."
+
+while true; do
+  VALUE=$(az storage account show \
+    --name $STORAGE_NAME \
+    --resource-group $RG \
+    --query "allowBlobPublicAccess" -o tsv)
+
+  if [ "$VALUE" = "true" ]; then
+    echo "Setting is active!"
+    break
+  fi
+
+  echo "Still not ready... waiting 5s"
+  sleep 5
+done
 
 # Get storage key
 STORAGE_KEY=$(az storage account keys list \
@@ -51,65 +69,67 @@ az storage container create \
 # -----------------------------
 # Web App (API)
 # -----------------------------
-#echo "▶️ Creating App Service plan..."
-#az appservice plan create \
-#  --name $APP_SERVICE_PLAN \
-#  --resource-group $RG \
-#  --sku F1 \
-#  --is-linux
-#
-#echo "▶️ Creating Node.js web app..."
-#az webapp create \
-#  --resource-group $RG \
-#  --plan $APP_SERVICE_PLAN \
-#  --name $WEBAPP_NAME \
-#  --runtime "NODE:20-lts"
+echo "▶️ Creating App Service plan..."
+az appservice plan create \
+ --name $APP_SERVICE_PLAN \
+ --resource-group $RG \
+ --sku F1 \
+ --is-linux
+
+
+echo "▶️ Creating Node.js web app..."
+az webapp create \
+ --resource-group $RG \
+ --plan $APP_SERVICE_PLAN \
+ --name $WEBAPP_NAME \
+ --runtime "NODE:20-lts"
 
 # -----------------------------
 # PostgreSQL database
 # -----------------------------
-#echo "▶️ Creating PostgreSQL Flexible Server..."
-#az postgres flexible-server create \
-#  --name $DB_NAME \
-#  --resource-group $RG \
-#  --location $LOCATION \
-#  --admin-user $ADMIN_USER \
-#  --admin-password $ADMIN_PASS \
-#  --tier Burstable \
-#  --sku-name Standard_B1ms \
-#  --storage-size 32 \
-#  --version 17 \
-#  --public-access 0.0.0.0-255.255.255.255
+echo "▶️ Creating PostgreSQL Flexible Server..."
+az postgres flexible-server create \
+ --name $DB_NAME \
+ --resource-group $RG \
+ --location $LOCATION \
+ --admin-user $ADMIN_USER \
+ --admin-password $ADMIN_PASS \
+ --tier Burstable \
+ --sku-name Standard_B1ms \
+ --storage-size 32 \
+ --version 17 \
+ --public-access 0.0.0.0-255.255.255.255
 
 # Get the database connection string
-#DB_HOST="${DB_NAME}.postgres.database.azure.com"
-#DB_URL="postgresql://${ADMIN_USER}:${ADMIN_PASS}@${DB_HOST}:5432/${DB_NAME}?sslmode=require"
+DB_HOST="${DB_NAME}.postgres.database.azure.com"
+DB_URL="postgresql://${ADMIN_USER}:${ADMIN_PASS}@${DB_HOST}:5432/${DB_NAME}?sslmode=require"
 
 # Set it as environment variable for the API
-#echo "▶️ Setting environment variables for Web App..."
-#az webapp config appsettings set \
-#  --name $WEBAPP_NAME \
-#  --resource-group $RG \
-#  --settings \
-#  DATABASE_URL=$DB_URL \
-#  AZURE_STORAGE_ACCOUNT="$STORAGE_NAME" \
-#  AZURE_STORAGE_KEY="$STORAGE_KEY" \
-#  BLOB_CONTAINER_NAME="$CONTAINER_NAME" \
-#  NODE_ENV="production"
+echo "▶️ Setting environment variables for Web App..."
+az webapp config appsettings set \
+ --name $WEBAPP_NAME \
+ --resource-group $RG \
+ --settings \
+ DATABASE_URL=$DB_URL \
+ AZURE_STORAGE_ACCOUNT="$STORAGE_NAME" \
+ AZURE_STORAGE_KEY="$STORAGE_KEY" \
+ BLOB_CONTAINER_NAME="$CONTAINER_NAME" \
+ NODE_ENV="production"
 
 # -----------------------------
 # Static Web App (Frontend)
 # -----------------------------
-#echo "▶️ Creating Static Web App..."
-#az staticwebapp create \
-#  --name $STATICAPP_NAME \
-#  --resource-group $RG \
-#  --source https://github.com/Sci-Studio/bookstore.webgui \
-#  --branch main \
-#  --location $LOCATION \
-#  --app-location "/" \
-#  --output-location "dist" \
-#  --sku Free
+echo "▶️ Creating Static Web App..."
+az staticwebapp create \
+ --name $STATICAPP_NAME \
+ --resource-group $RG \
+ --source https://github.com/Sci-Studio/bookstore.webgui \
+ --branch main \
+ --location $LOCATION \
+ --app-location "/" \
+ --output-location "dist" \
+ --sku Free \
+ --login-with-github
 
 # -----------------------------
 # Summary
