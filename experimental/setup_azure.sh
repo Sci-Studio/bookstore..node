@@ -11,10 +11,10 @@ WEBAPP_NAME="bookstore-api-$RANDOM"
 STATICAPP_NAME="bookstore-web-$RANDOM"
 STORAGE_NAME="bookstorestorage$RANDOM"
 DB_NAME="bookstoredb"
-ADMIN_USER="pgadmin"
+ADMIN_USER=""
 # replace with a strong password before running script
-ADMIN_PASS="7elwaEldonia632!"
-CONTAINER_NAME="book-images"
+ADMIN_PASS=""
+CONTAINER_NAME=""
 
 # -----------------------------
 # Resource group
